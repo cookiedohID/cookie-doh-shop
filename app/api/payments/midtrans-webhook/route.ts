@@ -57,7 +57,8 @@ export async function POST(req: Request) {
 
     // Auto-book ONLY if PAID and courier_etd includes "next" or "next-day" or "1 day"
     const etd = String(order.courier_etd || "").toLowerCase();
-    const isNextDay = etd.includes("next") || etd.includes("1 day") || etd.includes("1 hari") || etd.includes("besok") || etd.includes("h+1");
+    const isNextDay = String(order.shipping_speed || "NEXT_DAY") === "NEXT_DAY";
+
 
     if (paid && isNextDay && !order.biteship_order_id) {
       if (!process.env.BITESHIP_API_KEY) throw new Error("BITESHIP_API_KEY not set");

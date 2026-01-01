@@ -53,36 +53,40 @@ export async function POST(req: Request) {
       await client.query("BEGIN");
 
       const orderRes = await client.query(
-        `insert into orders (
-          order_no, customer_name, phone, email, address, city, postal, notes,
-          subtotal_idr, shipping_cost_idr, total_idr,
-          courier_code, courier_service, courier_etd,
-          payment_status, midtrans_order_id
-        ) values (
-          $1,$2,$3,$4,$5,$6,$7,$8,
-          $9,$10,$11,
-          $12,$13,$14,
-          'PENDING',$15
-        )
-        returning id`,
-        [
-          orderNo,
-          customer.name,
-          customer.phone,
-          customer.email || null,
-          customer.address,
-          customer.city,
-          customer.postal || null,
-          customer.notes || null,
-          subtotal,
-          shippingCost,
-          total,
-          shipping?.courierCode || null,
-          shipping?.courierService || null,
-          shipping?.etd || null,
-          orderNo,
-        ]
-      );
+  `insert into orders (
+    order_no, customer_name, phone, email, address, city, postal, notes,
+    subtotal_idr, shipping_cost_idr, total_idr,
+    courier_code, courier_service, courier_etd,
+    shipping_speed,
+    payment_status, midtrans_order_id
+  ) values (
+    $1,$2,$3,$4,$5,$6,$7,$8,
+    $9,$10,$11,
+    $12,$13,$14,
+    $15,
+    'PENDING',$16
+  )
+  returning id`,
+  [
+    orderNo,
+    customer.name,
+    customer.phone,
+    customer.email || null,
+    customer.address,
+    customer.city,
+    customer.postal || null,
+    customer.notes || null,
+    subtotal,
+    shippingCost,
+    total,
+    shipping?.courierCode || null,
+    shipping?.courierService || null,
+    shipping?.etd || null,
+    shipping?.shippingSpeed || "NEXT_DAY",
+    orderNo,
+  ]
+);
+
 
       const orderId = orderRes.rows[0].id;
 
