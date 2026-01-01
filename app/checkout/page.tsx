@@ -373,10 +373,13 @@ if (!res.ok) {
                   </>
                 ) : (
                   <div className="grid" style={{ gap: 12 }}>
-                    {[
-                      ["Same-day", rates.sameday],
-                      ["Next-day", rates.nextday],
-                    ].map(([title, list]) => (
+                    {(
+                        [
+                           ["Same-day", rates.sameday],
+                           ["Next-day", rates.nextday],
+                        ] as [string, ShippingOption[]][]
+                        ).map(([title, list]) => (
+                   
                       <div key={String(title)}>
                         <div style={{ fontWeight: 800 }}>{title}</div>
                         <div className="grid" style={{ gap: 8, marginTop: 8 }}>
