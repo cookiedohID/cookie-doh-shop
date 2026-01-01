@@ -67,8 +67,8 @@ if (url.searchParams.get("debug") === "1") {
 
 
     // ✅ SAFE DEBUG (no key exposed)
-    const url = new URL(req.url);
     if (url.searchParams.get("debug") === "1") {
+
       return NextResponse.json(
         {
           debug: {
