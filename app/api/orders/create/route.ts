@@ -3,7 +3,6 @@ import { Pool } from "pg";
 
 const PRICES: Record<number, number> = { 1: 32500, 3: 90000, 6: 180000 };
 
-// Create a dedicated pool here to avoid any weird import issues
 let pool: Pool | null = null;
 function getPool() {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
@@ -21,10 +20,6 @@ function makeOrderNo() {
 }
 
 export async function POST(req: Request) {
-
-
-
-
   try {
     const body = await req.json();
 
@@ -33,10 +28,10 @@ export async function POST(req: Request) {
     const shipping = body.shipping;
 
     if (!customer?.name || !customer?.phone || !customer?.address || !customer?.city) {
-      return NextResponse.json({ error: "Missing customer fields" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Missing customer fields", version: "orders-create-v4" }, { status: 400 });
     }
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
-      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Cart is empty", version: "orders-create-v4" }, { status: 400 });
     }
 
     const subtotal = cartItems.reduce((sum: number, it: any) => {
@@ -104,8 +99,8 @@ export async function POST(req: Request) {
       client.release();
     }
 
-    return NextResponse.json({ orderNo, subtotal, shippingCost, total });
+    return NextResponse.json({ ok: true, orderNo, subtotal, shippingCost, total, version: "orders-create-v4" });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Create order failed" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: e?.message || "Create order failed", version: "orders-create-v4" }, { status: 500 });
   }
 }
