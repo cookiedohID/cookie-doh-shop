@@ -1,10 +1,20 @@
-// deployed fix v2
-
-
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { Pool } from "pg";
 
 const PRICES: Record<number, number> = { 1: 32500, 3: 90000, 6: 180000 };
+
+// Create a dedicated pool here to avoid any weird import issues
+let pool: Pool | null = null;
+function getPool() {
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : undefined,
+    });
+  }
+  return pool;
+}
 
 function makeOrderNo() {
   return "CD-" + Date.now();
@@ -35,9 +45,7 @@ export async function POST(req: Request) {
 
     const orderNo = makeOrderNo();
 
-    const pool = db();
-    const client = await pool.connect();
-
+    const client = await getPool().connect();
     try {
       await client.query("BEGIN");
 
