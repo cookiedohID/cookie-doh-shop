@@ -216,6 +216,14 @@ if (!res.ok) {
     });
   }
 
+const rateGroups: Array<[string, ShippingOption[]]> = rates
+  ? [
+      ["Same-day", rates.sameday],
+      ["Next-day", rates.nextday],
+    ]
+  : [];
+
+
   return (
     <main className="grid" style={{ gap: 16 }}>
       <div className="card">
@@ -373,50 +381,47 @@ if (!res.ok) {
                   </>
                 ) : (
                   <div className="grid" style={{ gap: 12 }}>
-                    {(
-                        [
-                           ["Same-day", rates.sameday],
-                           ["Next-day", rates.nextday],
-                        ] as [string, ShippingOption[]][]
-                        ).map(([title, list]) => (
-                   
-                      <div key={String(title)}>
-                        <div style={{ fontWeight: 800 }}>{title}</div>
-                        <div className="grid" style={{ gap: 8, marginTop: 8 }}>
-                          {(list as ShippingOption[]).map((o, idx) => (
-                            <label
-                              key={o.courierCode + o.serviceCode + idx}
-                              className="card"
-                              style={{ cursor: "pointer" }}
-                            >
-                              <div className="row" style={{ alignItems: "flex-start" }}>
-                                <div style={{ display: "flex", gap: 10 }}>
-                                  <input
-                                    type="radio"
-                                    checked={
-                                      selectedRate?.courierCode === o.courierCode &&
-                                      selectedRate?.serviceCode === o.serviceCode
-                                    }
-                                    onChange={() => setSelectedRate(o)}
-                                  />
-                                  <div>
-                                    <div style={{ fontWeight: 900 }}>
-                                      {o.courierName} — {o.serviceName}
-                                    </div>
-                                    <div className="muted small">
-                                      ETA: {o.etd || String(title)}
-                                    </div>
-                                  </div>
-                                </div>
-                                <div style={{ fontWeight: 900 }}>
-                                  {formatIdr(o.price)}
-                                </div>
-                              </div>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+{rateGroups.map(([title, list]) => (
+  <div key={title}>
+    <div style={{ fontWeight: 800 }}>{title}</div>
+
+    <div className="grid" style={{ gap: 8, marginTop: 8 }}>
+      {(list as ShippingOption[]).length === 0 ? (
+        <div className="muted small">No options for this address.</div>
+      ) : (
+        (list as ShippingOption[]).map((o, idx) => (
+          <label
+            key={o.courierCode + o.serviceCode + idx}
+            className="card"
+            style={{ cursor: "pointer" }}
+          >
+            <div className="row" style={{ alignItems: "flex-start" }}>
+              <div style={{ display: "flex", gap: 10 }}>
+                <input
+                  type="radio"
+                  checked={
+                    selectedRate?.courierCode === o.courierCode &&
+                    selectedRate?.serviceCode === o.serviceCode
+                  }
+                  onChange={() => setSelectedRate(o)}
+                />
+                <div>
+                  <div style={{ fontWeight: 900 }}>
+                    {o.courierName} — {o.serviceName}
+                  </div>
+                  <div className="muted small">ETA: {o.etd || title}</div>
+                </div>
+              </div>
+
+              <div style={{ fontWeight: 900 }}>{formatIdr(o.price)}</div>
+            </div>
+          </label>
+        ))
+      )}
+    </div>
+  </div>
+))}
+
                   </div>
                 )}
               </div>
