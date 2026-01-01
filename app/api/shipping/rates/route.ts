@@ -20,112 +20,62 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // ---- DEBUG (temporary) ----
-const debug = {
-  hasKey: !!process.env.BITESHIP_API_KEY,
-  originName: process.env.BITESHIP_ORIGIN_CONTACT_NAME || null,
-  originPhone: process.env.BITESHIP_ORIGIN_PHONE || null,
-  originAddress: process.env.BITESHIP_ORIGIN_ADDRESS || null,
-  originCity: process.env.BITESHIP_ORIGIN_CITY || null,
-  originPostal: process.env.BITESHIP_ORIGIN_POSTAL_CODE || null,
-  destPostal: body.postalCode || null,
-  destCity: body.city || null,
-  destAddressFilled: !!body.addressLine,
-};
-// Return debug if query param ?debug=1 is present
-// (so normal users won't see it)
-const url = new URL(req.url);
-if (url.searchParams.get("debug") === "1") {
-  return NextResponse.json({ debug }, { status: 200 });
-}
-// ---- END DEBUG ----
+    // ✅ SAFE DEBUG (no key exposed)
+    const url = new URL(req.url);
+    if (url.searchParams.get("debug") === "1") {
+      return NextResponse.json(
+        {
+          debug: {
+            hasKey: !!process.env.BITESHIP_API_KEY,
+            originPostal: process.env.BITESHIP_ORIGIN_POSTAL_CODE || null,
+            originCity: process.env.BITESHIP_ORIGIN_CITY || null,
+            originAddress: process.env.BITESHIP_ORIGIN_ADDRESS ? "set" : null,
+            originPhone: process.env.BITESHIP_ORIGIN_PHONE ? "set" : null,
+            destPostal: body.postalCode || null,
+          },
+        },
+        { status: 200 }
+      );
+    }
 
+    // ✅ Required env vars for postal-code mode
+    if (!process.env.BITESHIP_API_KEY) {
+      return NextResponse.json({ error: "Missing BITESHIP_API_KEY on Vercel" }, { status: 500 });
+    }
+    if (!process.env.BITESHIP_ORIGIN_POSTAL_CODE) {
+      return NextResponse.json({ error: "Missing BITESHIP_ORIGIN_POSTAL_CODE on Vercel" }, { status: 500 });
+    }
 
-
-if (!process.env.BITESHIP_API_KEY) {
-  return NextResponse.json({ error: "Missing BITESHIP_API_KEY on Vercel" }, { status: 500 });
-}
-if (!process.env.BITESHIP_ORIGIN_PHONE) {
-  return NextResponse.json({ error: "Missing BITESHIP_ORIGIN_PHONE on Vercel" }, { status: 500 });
-}
-if (!process.env.BITESHIP_ORIGIN_ADDRESS) {
-  return NextResponse.json({ error: "Missing BITESHIP_ORIGIN_ADDRESS on Vercel" }, { status: 500 });
-}
-if (!body.postalCode || String(body.postalCode).trim().length < 4) {
-  return NextResponse.json({ error: "Fill Postal Code to get shipping options" }, { status: 400 });
-}
-
-
-
-
-    const addressLine = String(body.addressLine || "").trim();
-    const district = String(body.district || "").trim();
-    const city = String(body.city || "").trim();
-    const province = String(body.province || "").trim();
     const postalCode = String(body.postalCode || "").trim();
+    if (postalCode.length < 4) {
+      return NextResponse.json({ error: "Fill Postal Code to get shipping options" }, { status: 400 });
+    }
 
     const weightGrams = Number(body.weightGrams || 1600);
     const length = Number(body.length || 22);
     const width = Number(body.width || 10);
     const height = Number(body.height || 10);
 
-if (!process.env.BITESHIP_API_KEY) {
-  return NextResponse.json({ error: "Missing BITESHIP_API_KEY on Vercel env vars" }, { status: 500 });
-}
-if (!process.env.BITESHIP_ORIGIN_PHONE) {
-  return NextResponse.json({ error: "Missing BITESHIP_ORIGIN_PHONE on Vercel env vars" }, { status: 500 });
-}
-if (!process.env.BITESHIP_ORIGIN_ADDRESS) {
-  return NextResponse.json({ error: "Missing BITESHIP_ORIGIN_ADDRESS on Vercel env vars" }, { status: 500 });
-}
-if (!body.postalCode || String(body.postalCode).trim().length < 4) {
-  return NextResponse.json({ error: "Fill Postal Code to get shipping options" }, { status: 400 });
-}
-
-
-    // Hard validation (so we catch missing fields BEFORE calling Biteship)
-    if (!addressLine) {
-      return NextResponse.json({ error: "Missing: addressLine (fill Address on checkout)" }, { status: 400 });
-    }
-    if (!city) {
-      return NextResponse.json({ error: "Missing: city (fill City on checkout)" }, { status: 400 });
-    }
-    if (!process.env.BITESHIP_API_KEY) {
-      return NextResponse.json({ error: "Missing: BITESHIP_API_KEY in .env.local" }, { status: 500 });
-    }
-    if (!process.env.BITESHIP_ORIGIN_PHONE) {
-      return NextResponse.json({ error: "Missing: BITESHIP_ORIGIN_PHONE in .env.local" }, { status: 500 });
-    }
-    if (!process.env.BITESHIP_ORIGIN_ADDRESS) {
-      return NextResponse.json({ error: "Missing: BITESHIP_ORIGIN_ADDRESS in .env.local" }, { status: 500 });
-    }
-
     const payload = {
-        // ✅ required location method (postal codes)
-          origin_postal_code: Number(process.env.BITESHIP_ORIGIN_POSTAL_CODE),
-          destination_postal_code: Number(postalCode),
+      origin_postal_code: Number(process.env.BITESHIP_ORIGIN_POSTAL_CODE),
+      destination_postal_code: Number(postalCode),
 
-        // ✅ required
-  couriers: "paxel,gojek,grab,jne,jnt,sicepat,anteraja,pos",
+      // ✅ correct key name
+      couriers: "paxel,gosend,grabexpress,jne,jnt,sicepat,anteraja,pos",
 
-        // ✅ required for parcel quote
-            items: [
-            {
-                name: "Cookie Doh",
-                description: "Fresh cookies (max next-day)",
-                value: 0,
-                quantity: 1,
-                weight: weightGrams,
-                length,
-                width,
-                height,
-            },
-  ],
-};
-
-
-    // DEBUG (shows in Terminal logs)
-    console.log("BITESHIP rates payload:", JSON.stringify(payload, null, 2));
+      items: [
+        {
+          name: "Cookie Doh",
+          description: "Fresh cookies (max next-day)",
+          value: 0,
+          quantity: 1,
+          weight: weightGrams,
+          length,
+          width,
+          height,
+        },
+      ],
+    };
 
     const res = await fetch("https://api.biteship.com/v1/rates/couriers", {
       method: "POST",
@@ -138,8 +88,6 @@ if (!body.postalCode || String(body.postalCode).trim().length < 4) {
     });
 
     const text = await res.text();
-    console.log("BITESHIP raw response:", res.status, text);
-
     if (!res.ok) {
       return NextResponse.json({ error: `Biteship error ${res.status}: ${text}` }, { status: 500 });
     }
@@ -150,18 +98,14 @@ if (!body.postalCode || String(body.postalCode).trim().length < 4) {
     const options = list.map((x: any) => {
       const courierCode = x.courier_code ?? x.courier?.code ?? x.code ?? "";
       const courierName = x.courier_name ?? x.courier?.name ?? x.name ?? courierCode;
-
       const serviceCode = x.courier_service_code ?? x.service_code ?? x.service ?? "";
       const serviceName = x.courier_service_name ?? x.service_name ?? x.service ?? serviceCode;
-
       const price = Number(x.price ?? x.final_price ?? x.amount ?? 0);
       const etd = String(x.etd ?? x.duration ?? x.estimation ?? "");
-
-      const flags = flagsFromEtd(etd);
-      return { courierCode, courierName, serviceCode, serviceName, price, etd, ...flags };
+      return { courierCode, courierName, serviceCode, serviceName, price, etd, ...flagsFromEtd(etd) };
     });
 
-    // Freshness rule: ONLY same-day or next-day
+    // Freshness rule: only same-day or next-day
     const allowed = options.filter((o: any) => o.isSameDay || o.isNextDay);
     const sameday = allowed.filter((o: any) => o.isSameDay).sort((a: any, b: any) => a.price - b.price);
     const nextday = allowed.filter((o: any) => o.isNextDay && !o.isSameDay).sort((a: any, b: any) => a.price - b.price);
