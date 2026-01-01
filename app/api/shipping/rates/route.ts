@@ -31,6 +31,20 @@ export async function POST(req: Request) {
     const width = Number(body.width || 10);
     const height = Number(body.height || 10);
 
+if (!process.env.BITESHIP_API_KEY) {
+  return NextResponse.json({ error: "Missing BITESHIP_API_KEY on Vercel env vars" }, { status: 500 });
+}
+if (!process.env.BITESHIP_ORIGIN_PHONE) {
+  return NextResponse.json({ error: "Missing BITESHIP_ORIGIN_PHONE on Vercel env vars" }, { status: 500 });
+}
+if (!process.env.BITESHIP_ORIGIN_ADDRESS) {
+  return NextResponse.json({ error: "Missing BITESHIP_ORIGIN_ADDRESS on Vercel env vars" }, { status: 500 });
+}
+if (!body.postalCode || String(body.postalCode).trim().length < 4) {
+  return NextResponse.json({ error: "Fill Postal Code to get shipping options" }, { status: 400 });
+}
+
+
     // Hard validation (so we catch missing fields BEFORE calling Biteship)
     if (!addressLine) {
       return NextResponse.json({ error: "Missing: addressLine (fill Address on checkout)" }, { status: 400 });
