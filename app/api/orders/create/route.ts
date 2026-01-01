@@ -22,7 +22,7 @@ function makeOrderNo() {
 
 export async function POST(req: Request) {
 
-return NextResponse.json({ ok: false, error: "DEPLOY CHECK: orders-create v3" }, { status: 400 });
+
 
 
   try {
