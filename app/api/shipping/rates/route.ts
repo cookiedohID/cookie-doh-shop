@@ -20,7 +20,26 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    
+    // ---- DEBUG (temporary) ----
+const debug = {
+  hasKey: !!process.env.BITESHIP_API_KEY,
+  originName: process.env.BITESHIP_ORIGIN_CONTACT_NAME || null,
+  originPhone: process.env.BITESHIP_ORIGIN_PHONE || null,
+  originAddress: process.env.BITESHIP_ORIGIN_ADDRESS || null,
+  originCity: process.env.BITESHIP_ORIGIN_CITY || null,
+  originPostal: process.env.BITESHIP_ORIGIN_POSTAL_CODE || null,
+  destPostal: body.postalCode || null,
+  destCity: body.city || null,
+  destAddressFilled: !!body.addressLine,
+};
+// Return debug if query param ?debug=1 is present
+// (so normal users won't see it)
+const url = new URL(req.url);
+if (url.searchParams.get("debug") === "1") {
+  return NextResponse.json({ debug }, { status: 200 });
+}
+// ---- END DEBUG ----
+
 
 
 if (!process.env.BITESHIP_API_KEY) {
