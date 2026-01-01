@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+
 const PRICES: Record<number, number> = { 1: 32500, 3: 90000, 6: 180000 };
 
 let pool: Pool | null = null;
