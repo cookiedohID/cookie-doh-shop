@@ -108,13 +108,10 @@ export async function POST(req: Request) {
     
     } catch (e: any) {
   return NextResponse.json(
-    {
-      ok: false,
-      error: e?.message || "Create order failed",
-      stack: String(e?.stack || ""),
-      version: "orders-create-v5",
-    },
+    { ok: false, error: e?.message || "Create order failed" },
     { status: 500 }
   );
 }
+
+
 }
