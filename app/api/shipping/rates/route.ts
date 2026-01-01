@@ -46,6 +46,26 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+
+    const url = new URL(req.url);
+if (url.searchParams.get("debug") === "1") {
+  return NextResponse.json(
+    {
+      received: {
+        addressLine: body.addressLine || null,
+        city: body.city || null,
+        postalCode: body.postalCode || null,
+        weightGrams: body.weightGrams || null,
+      },
+      env: {
+        originPostal: process.env.BITESHIP_ORIGIN_POSTAL_CODE || null,
+      },
+    },
+    { status: 200 }
+  );
+}
+
+
     // ✅ SAFE DEBUG (no key exposed)
     const url = new URL(req.url);
     if (url.searchParams.get("debug") === "1") {
