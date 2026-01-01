@@ -104,7 +104,17 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ ok: true, orderNo, subtotal, shippingCost, total, version: "orders-create-v4" });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message || "Create order failed", version: "orders-create-v4" }, { status: 500 });
-  }
+  
+    
+    } catch (e: any) {
+  return NextResponse.json(
+    {
+      ok: false,
+      error: e?.message || "Create order failed",
+      stack: String(e?.stack || ""),
+      version: "orders-create-v5",
+    },
+    { status: 500 }
+  );
+}
 }
