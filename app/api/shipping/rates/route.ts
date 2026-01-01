@@ -20,6 +20,9 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+    return NextResponse.json({ error: "DEPLOY CHECK OK (remove this line after test)" }, { status: 400 });
+
+
     if (!process.env.BITESHIP_API_KEY) {
   return NextResponse.json(
     { error: "Missing BITESHIP_API_KEY on Vercel env vars" },
