@@ -16,6 +16,33 @@ function flagsFromEtd(etdRaw: string) {
   return { isSameDay, isNextDay };
 }
 
+import { NextResponse } from "next/server";
+
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+
+  if (url.searchParams.get("debug") === "1") {
+    return NextResponse.json(
+      {
+        debug: {
+          hasKey: !!process.env.BITESHIP_API_KEY,
+          originPostal: process.env.BITESHIP_ORIGIN_POSTAL_CODE || null,
+          originCity: process.env.BITESHIP_ORIGIN_CITY || null,
+          originAddress: process.env.BITESHIP_ORIGIN_ADDRESS ? "set" : null,
+          originPhone: process.env.BITESHIP_ORIGIN_PHONE ? "set" : null,
+        },
+      },
+      { status: 200 }
+    );
+  }
+
+  return NextResponse.json(
+    { error: "Use POST for shipping rates" },
+    { status: 405 }
+  );
+}
+
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
