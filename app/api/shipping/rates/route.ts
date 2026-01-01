@@ -20,6 +20,35 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+    if (!process.env.BITESHIP_API_KEY) {
+  return NextResponse.json(
+    { error: "Missing BITESHIP_API_KEY on Vercel env vars" },
+    { status: 500 }
+  );
+}
+
+if (!process.env.BITESHIP_ORIGIN_PHONE) {
+  return NextResponse.json(
+    { error: "Missing BITESHIP_ORIGIN_PHONE on Vercel env vars" },
+    { status: 500 }
+  );
+}
+
+if (!process.env.BITESHIP_ORIGIN_ADDRESS) {
+  return NextResponse.json(
+    { error: "Missing BITESHIP_ORIGIN_ADDRESS on Vercel env vars" },
+    { status: 500 }
+  );
+}
+
+if (!body.postalCode || String(body.postalCode).trim().length < 4) {
+  return NextResponse.json(
+    { error: "Fill Postal Code to get shipping options" },
+    { status: 400 }
+  );
+}
+
+
     const addressLine = String(body.addressLine || "").trim();
     const district = String(body.district || "").trim();
     const city = String(body.city || "").trim();
