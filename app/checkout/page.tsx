@@ -56,6 +56,8 @@ export default function CheckoutPage() {
   const [selectedRate, setSelectedRate] = useState<ShippingOption | null>(null);
   const [rateError, setRateError] = useState<string>("");
   const [loadingRates, setLoadingRates] = useState(false);
+  const [selectedSpeed, setSelectedSpeed] = useState<"SAME_DAY" | "NEXT_DAY">("SAME_DAY");
+
 
   useEffect(() => {
     setItems(getCart());
@@ -121,6 +123,8 @@ export default function CheckoutPage() {
   }
 
   async function payWithMidtrans() {
+
+
     if (!form.name || !form.phone || !form.address || !form.city) {
       alert("Please fill Name, WhatsApp, Address, and City.");
       return;
@@ -147,11 +151,15 @@ const createRes = await fetch("/api/orders/create", {
     cartItems: items,
     shipping: selectedRate
   ? {
+
+
+shipping: selectedRate
+  ? {
       price: selectedRate.price,
       courierCode: selectedRate.courierCode,
       courierService: selectedRate.serviceCode,
       etd: selectedRate.etd,
-      shippingSpeed: selectedRate.isSameDay ? "SAME_DAY" : "NEXT_DAY",
+      shippingSpeed: selectedSpeed,
     }
   : {
       price: shippingCost,
@@ -160,6 +168,7 @@ const createRes = await fetch("/api/orders/create", {
       etd: shippingChoice,
       shippingSpeed: shippingChoice === "SAME_DAY" ? "SAME_DAY" : "NEXT_DAY",
     },
+
 
   }),
 });
@@ -362,10 +371,8 @@ const rateGroups: Array<[string, ShippingOption[]]> = rates
                       <input
                         type="radio"
                         checked={shippingChoice === "NEXT_DAY"}
-                        onChange={() => {
-                          setSelectedRate(null);
-                          setShippingChoice("NEXT_DAY");
-                        }}
+                        onChange={() => { setSelectedRate(o); setSelectedSpeed("NEXT_DAY"); }}
+
                       />
                       Next-day (recommended) — {formatIdr(25000)}
                     </label>
@@ -374,10 +381,8 @@ const rateGroups: Array<[string, ShippingOption[]]> = rates
                       <input
                         type="radio"
                         checked={shippingChoice === "SAME_DAY"}
-                        onChange={() => {
-                          setSelectedRate(null);
-                          setShippingChoice("SAME_DAY");
-                        }}
+                        onChange={() => { setSelectedRate(o); setSelectedSpeed("SAME_DAY"); }}
+
                       />
                       Same-day — {formatIdr(45000)}
                     </label>

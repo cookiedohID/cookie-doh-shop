@@ -47,7 +47,7 @@ export async function POST(req: Request) {
        returning
          id, order_no, customer_name, phone, email, address, city, postal,
          courier_code, courier_service, courier_etd,
-         biteship_order_id`,
+         biteship_order_id, shipping_speed`,
       [paymentStatus, transactionStatus, orderNo]
     );
 
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     const order = rows[0];
 
     // Auto-book ONLY if PAID and courier_etd includes "next" or "next-day" or "1 day"
-    const etd = String(order.courier_etd || "").toLowerCase();
+    
     const isNextDay = String(order.shipping_speed || "NEXT_DAY") === "NEXT_DAY";
 
 
