@@ -366,7 +366,8 @@ const rateGroups: Array<[string, ShippingOption[]]> = rates
                       <input
                         type="radio"
                         checked={shippingChoice === "NEXT_DAY"}
-                        onChange={() => { setSelectedRate(o); setSelectedSpeed("NEXT_DAY"); }}
+                        onChange={() => { setSelectedRate(null); setSelectedSpeed("NEXT_DAY"); setShippingChoice("NEXT_DAY"); }}
+
 
                       />
                       Next-day (recommended) — {formatIdr(25000)}
@@ -376,7 +377,8 @@ const rateGroups: Array<[string, ShippingOption[]]> = rates
                       <input
                         type="radio"
                         checked={shippingChoice === "SAME_DAY"}
-                        onChange={() => { setSelectedRate(o); setSelectedSpeed("SAME_DAY"); }}
+                        onChange={() => { setSelectedRate(null); setSelectedSpeed("SAME_DAY"); setShippingChoice("NEXT_DAY"); }}
+
 
                       />
                       Same-day — {formatIdr(45000)}
