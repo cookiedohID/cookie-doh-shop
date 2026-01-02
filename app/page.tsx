@@ -46,18 +46,9 @@ export default function Home() {
       </div>
 
       {/* TEST button bottom-right */}
-      <Link
-        href="/checkout"
-        className="btn"
-        style={{
-          position: "fixed",
-          right: 16,
-          bottom: 16,
-          zIndex: 50,
-        }}
-      >
-        TEST
-      </Link>
+        <Link href="/test" className="btn" style={{ position: "fixed", right: 16, bottom: 16, zIndex: 50 }}>
+            TEST
+        </Link>
     </main>
   );
 }
