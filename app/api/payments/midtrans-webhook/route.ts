@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
-import { biteshipCreateShipment } from "@/app/lib/biteship";
+import { biteshipCreateShipment } from "@/lib/biteship";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
