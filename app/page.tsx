@@ -2,8 +2,34 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main style={{ minHeight: "80vh", display: "flex", alignItems: "center" }}>
-      <div className="card" style={{ width: "100%" }}>
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#fff",
+      }}
+    >
+      <div
+        className="card"
+        style={{
+          maxWidth: 420,
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        {/* Coming Soon Image */}
+        <img
+          src="/coming-soon.jpg"
+          alt="Coming Soon"
+          style={{
+            width: "100%",
+            borderRadius: 12,
+            marginBottom: 16,
+          }}
+        />
+
         <div className="title">Cookie Doh</div>
         <div className="subtitle">Where the cookie magic happens</div>
 
@@ -11,15 +37,15 @@ export default function Home() {
 
         <div style={{ fontWeight: 900, fontSize: 22 }}>Coming Soon</div>
         <p className="muted" style={{ marginTop: 8 }}>
-          We’re baking something special. Please check back soon.
+          We’re baking something special.
         </p>
 
         <div className="muted small" style={{ marginTop: 14 }}>
-          (This website is currently in testing.)
+          (Website currently in testing)
         </div>
       </div>
 
-      {/* Test button bottom-right */}
+      {/* TEST button bottom-right */}
       <Link
         href="/checkout"
         className="btn"
