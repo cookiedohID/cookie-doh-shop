@@ -150,28 +150,23 @@ const createRes = await fetch("/api/orders/create", {
     },
     cartItems: items,
     shipping: selectedRate
-  ? {
-
-
-shipping: selectedRate
-  ? {
-      price: selectedRate.price,
-      courierCode: selectedRate.courierCode,
-      courierService: selectedRate.serviceCode,
-      etd: selectedRate.etd,
-      shippingSpeed: selectedSpeed,
-    }
-  : {
-      price: shippingCost,
-      courierCode: null,
-      courierService: shippingChoice,
-      etd: shippingChoice,
-      shippingSpeed: shippingChoice === "SAME_DAY" ? "SAME_DAY" : "NEXT_DAY",
-    },
-
-
+      ? {
+          price: selectedRate.price,
+          courierCode: selectedRate.courierCode,
+          courierService: selectedRate.serviceCode,
+          etd: selectedRate.etd,
+          shippingSpeed: selectedSpeed,
+        }
+      : {
+          price: shippingCost,
+          courierCode: null,
+          courierService: shippingChoice,
+          etd: shippingChoice,
+          shippingSpeed: shippingChoice === "SAME_DAY" ? "SAME_DAY" : "NEXT_DAY",
+        },
   }),
 });
+
 
 const created = await createRes.json();
 if (!createRes.ok) {
